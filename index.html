@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Java 全栈 30 天冲刺计划</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --text:#1f2328; --muted:#6a737d; --line:#e4e7eb;
+    --done:#16a34a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;
+  }
+  header{
+    position:sticky;top:0;z-index:10;background:rgba(255,255,255,.95);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);padding:14px 24px;
+  }
+  .head-wrap{max-width:1180px;margin:0 auto}
+  h1{font-size:22px;font-weight:700;letter-spacing:.5px}
+  .sub{color:var(--muted);font-size:14px;margin-top:2px}
+  .rhythm{display:inline-block;margin-top:8px;font-size:12.5px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:999px;padding:2px 12px}
+  .progress-row{display:flex;align-items:center;gap:12px;margin-top:10px}
+  .progress-track{flex:1;height:8px;background:#e9ecef;border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#3b82f6,#16a34a);border-radius:999px;transition:width .3s}
+  .progress-text{font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+  main{max-width:1180px;margin:0 auto;padding:24px 24px 8px}
+  .phase{margin-bottom:34px}
+  .phase-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .phase-badge{font-size:12px;font-weight:600;color:#fff;padding:2px 10px;border-radius:999px;white-space:nowrap}
+  .phase-head h2{font-size:17px;font-weight:700}
+  .phase-days{font-size:12.5px;color:var(--muted);white-space:nowrap}
+  .phase-desc{font-size:12.5px;color:var(--muted);opacity:.85}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;
+    cursor:pointer;user-select:none;position:relative;transition:box-shadow .15s,transform .15s;
+  }
+  .card:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);transform:translateY(-1px)}
+  .day-num{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:1px}
+  .card h3{font-size:15.5px;margin:4px 0 10px;padding-right:26px}
+  .card ul{list-style:none;font-size:13.5px;color:#3d434b}
+  .card ul li{padding-left:16px;position:relative;margin-bottom:3px}
+  .card ul li::before{content:"·";position:absolute;left:4px;font-weight:900}
+  .quiz{margin-top:10px;font-size:12.5px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 10px}
+  .check{
+    position:absolute;top:14px;right:14px;width:22px;height:22px;border:2px solid #cbd5e1;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;transition:all .15s;
+  }
+  .card.done{border-color:#86efac;background:#fbfefc}
+  .card.done .check{background:var(--done);border-color:var(--done)}
+  .card.done .day-num,.card.done ul,.card.done .quiz{opacity:.45}
+  .card.done h3{opacity:.55;text-decoration:line-through;text-decoration-color:#94a3b8}
+  footer{max-width:1180px;margin:0 auto;padding:0 24px 40px;font-size:13px;color:var(--muted)}
+  #reset{font-size:13px;color:#b91c1c;background:#fff;border:1px solid #fecaca;border-radius:8px;padding:6px 14px;cursor:pointer;margin-bottom:12px}
+  #reset:hover{background:#fef2f2}
+  footer p{margin-bottom:6px}
+  @media (max-width:640px){h1{font-size:18px}main{padding:16px 16px 8px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-wrap">
+    <h1>Java 全栈工程师 · 30 天冲刺计划</h1>
+    <p class="sub">每天 1 个技能点 · 3 小时 · 共 90 小时 · 目标：初级工程师水平</p>
+    <span class="rhythm">每日节奏：1h 学概念 → 1.5h 跟着敲 → 0.5h 独立复现</span>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="pf"></div></div>
+      <span class="progress-text" id="pt">已完成 0 / 30 天 · 0%</span>
+    </div>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<footer>
+  <button id="reset">重置全部进度</button>
+  <p>点击任意卡片标记「已完成」，进度保存在浏览器本地（localStorage），换设备或清缓存会丢失。</p>
+  <p>「初级工程师水平」= 能独立完成 <b>数据库设计 → 接口开发 → 前端页面 → 部署上线</b> 的完整 CRUD 应用，并具备基本的排错与协作能力。</p>
+  <p>进阶方向（JVM、并发、Redis、微服务、分布式）不在本 30 天范围内，先跑通全流程再深入。</p>
+</footer>
+
+<script>
+const KEY='java-fullstack-30-progress';
+let done=new Set(JSON.parse(localStorage.getItem(KEY)||'[]'));
+
+const PHASES=[
+  {badge:"阶段一",name:"Java 基础",range:[1,8],color:"#3b82f6",desc:"语言底子：语法 → 面向对象 → 集合 → 新特性"},
+  {badge:"阶段二",name:"数据库",range:[9,11],color:"#0d9488",desc:"MySQL + JDBC，后端的数据地基"},
+  {badge:"阶段三",name:"Spring Boot 后端",range:[12,18],color:"#ea580c",desc:"企业级开发主线，篇幅最重"},
+  {badge:"阶段四",name:"前端",range:[19,23],color:"#8b5cf6",desc:"Vue3 全家桶，够用就好"},
+  {badge:"阶段五",name:"工程化与部署",range:[24,26],color:"#475569",desc:"Git / Linux / 上线，工程师基本功"},
+  {badge:"阶段六",name:"项目实战",range:[27,30],color:"#e11d48",desc:"串起全流程，产出简历级项目"}
+];
+
+const DAYS={
+  1:{t:"开发环境与基础语法",p:["安装 JDK 17 + IDEA（社区版即可）","变量、八大基本数据类型、运算符","类型转换与 Scanner 键盘输入","第一个程序 HelloWorld → 控制台输出"],q:"独立写一个控制台「BMI 计算器」"},
+  2:{t:"流程控制与方法",p:["if / switch / for / while / break / continue","方法定义、参数、返回值、重载","IDEA 断点调试（Debug）必会"],q:"用方法重构计算器，再写一个猜数字游戏"},
+  3:{t:"面向对象基础",p:["类与对象、构造器、this 关键字","封装：private + getter / setter","static、工具类、包的概念"],q:"设计 Student / Book 实体类并调用"},
+  4:{t:"面向对象进阶",p:["继承、super、方法重写","多态、向上 / 向下转型","抽象类、接口、面向接口编程"],q:"用接口 + 多态实现多种支付方式"},
+  5:{t:"常用 API",p:["String / StringBuilder 核心方法","包装类、自动装箱拆箱","LocalDate / LocalDateTime / DateTimeFormatter","Arrays、Math、UUID"],q:"写一个统计字符串中字符出现次数的小工具"},
+  6:{t:"集合框架",p:["ArrayList / LinkedList 与使用场景","HashMap / HashSet 使用","泛型、增强 for、迭代器","Comparator 自定义排序"],q:"用 HashMap 实现英文单词计数器"},
+  7:{t:"异常与 IO 流",p:["try-catch-finally、throws、自定义异常","字节流 / 字符流、缓冲流","try-with-resources 自动关闭","Properties 读取配置文件"],q:"写一个日志文件读写小工具"},
+  8:{t:"Lambda 与 Stream",p:["Lambda 表达式、函数式接口","Stream：filter / map / sorted / collect","Optional 优雅判空"],q:"用 Stream 重写 Day 6 的集合练习"},
+  9:{t:"MySQL 安装与 SQL 基础",p:["安装 MySQL 8 + Navicat / DataGrip","DDL 建库建表、常用数据类型","DML：insert / update / delete","DQL：where、like、order by、limit"],q:"建一套「员工-部门表」并独立完成 10 条查询"},
+  10:{t:"多表查询与事务",p:["表关系：一对多 / 多对多、外键","内连接、左连接、子查询","聚合函数 + group by 分组统计","事务四大特性 ACID、索引概念"],q:"完成一个多表统计需求（如各部门平均薪资）"},
+  11:{t:"JDBC 与连接池",p:["JDBC 六大步骤纯手写一遍","PreparedStatement 防 SQL 注入","Druid / HikariCP 连接池","DAO 模式雏形"],q:"写一个 UserDao 完成登录验证"},
+  12:{t:"Spring Boot 入门",p:["Spring Initializr 创建第一个项目","项目结构、application.yml 配置","@RestController、@RequestMapping","三种接收参数的方式"],q:"写出 4 个能返回 JSON 的接口"},
+  13:{t:"整合 MyBatis-Plus",p:["引入依赖、配置数据源","BaseMapper 通用 CRUD","条件构造器 QueryWrapper","@TableName / @TableId 常用注解"],q:"对一张表完成整套 CRUD 接口"},
+  14:{t:"RESTful 与 HTTP",p:["HTTP 请求报文、常见状态码","RESTful 规范：GET / POST / PUT / DELETE","统一返回结果 Result<T>","Apifox / Postman 调试"],q:"按 REST 规范重构接口并全部测通"},
+  15:{t:"三层架构与参数校验",p:["Controller / Service / Mapper 分层","@Validated + 常用校验注解","全局异常处理 @RestControllerAdvice","@Slf4j 日志规范"],q:"给接口加参数校验 + 统一异常返回"},
+  16:{t:"登录认证",p:["用户表设计 + BCrypt 密码加密","JWT 令牌的生成与校验","拦截器统一校验 token","ThreadLocal 保存当前登录用户"],q:"完成注册 + 登录 + 受保护接口全流程"},
+  17:{t:"常用业务功能",p:["分页查询（MyBatis-Plus 分页插件）","文件上传 MultipartFile","多环境配置 dev / prod","时间戳 / 状态字段的设计习惯"],q:"完成带分页 + 头像上传的用户列表接口"},
+  18:{t:"测试与接口文档",p:["JUnit 5 编写单元测试","Knife4j 接口文档自动生成","mvn package 打包、本地跑 jar","Apifox 建测试集合"],q:"项目打包并在本机通过文档调通全部接口"},
+  19:{t:"HTML + CSS 基础",p:["常用标签与语义化结构","盒模型、选择器、优先级","Flex 弹性布局（重中之重）","媒体查询响应式入门"],q:"不用任何框架，手写登录页 + 列表页"},
+  20:{t:"JavaScript 基础",p:["变量、函数、数组 / 对象常用方法","DOM 操作与事件绑定","ES6：箭头函数、解构、模板字符串","async / await + fetch 发请求"],q:"原生 JS 调通你自己的一个后端接口"},
+  21:{t:"Vue3 快速上手",p:["用 Vite 创建 Vue3 项目","ref / reactive / computed / watch","指令：v-if、v-for、v-model","组件化思维与生命周期"],q:"用 Vue3 重写登录页并调通接口"},
+  22:{t:"组件通信与路由",p:["props / emit 父子组件通信","slot 插槽、组件 v-model","Vue Router：路由表、动态路由、守卫","Pinia 状态管理（存登录态）"],q:"搭一个带登录守卫的多页面应用骨架"},
+  23:{t:"Element Plus 与前后端联调",p:["表格 / 表单 / 弹窗常用组件","Axios 封装：拦截器 + baseURL + token","后端 CORS 跨域配置","联调排错：F12 Network 必会"],q:"登录页 + 列表页完整对接自己的接口"},
+  24:{t:"Git 与 Maven 进阶",p:["分支模型：main + feature 分支开发","合并冲突的解决流程","Maven 坐标、依赖范围、常用命令",".gitignore 与 README 规范"],q:"把 30 天以来所有代码推上 GitHub"},
+  25:{t:"Linux 基础",p:["云服务器（学生机即可）+ SSH 连接","高频命令：cd / ls / vim / tar / ps","systemctl 管理服务、查日志","防火墙与安全组端口放行"],q:"在服务器上独立装好 JDK 和 MySQL"},
+  26:{t:"项目部署上线",p:["后端 jar 上传、systemd / nohup 运行","Nginx 反向代理 + 前端静态部署","数据库远程连接配置","常见报错排查（端口 / 内存 / 路径）"],q:"让别人用公网 IP 能访问到你的项目"},
+  27:{t:"实战项目 · 设计与搭架",p:["选题：个人博客 / 待办清单 / 图书管理","需求拆解 → 接口清单 → 表结构设计","搭后端骨架 + 统一返回 / 异常 / 文档","前端项目初始化 + 路由规划"],q:"数据库建好、前后端骨架跑通"},
+  28:{t:"实战项目 · 后端开发",p:["用户模块：注册 / 登录 / 权限","核心业务模块全部接口","Apifox 自测每一个接口","补充单元测试与日志"],q:"所有接口在文档里全部调通"},
+  29:{t:"实战项目 · 前端与联调",p:["登录页、列表页、详情页、管理页","Axios 对接全部接口","体验优化：loading / 空状态 / 错误提示","前后端联调修完所有 bug"],q:"完整业务流程页面可正常操作"},
+  30:{t:"上线部署与复盘",p:["部署上线，公网可访问","写 README（架构 + 截图 + 演示）","复盘 30 天知识地图，标记薄弱点","简历项目描述 + 高频面试题过一遍"],q:"项目上线 + 简历上能写出去"}
+};
+
+const app=document.getElementById('app');
+
+PHASES.forEach(ph=>{
+  const sec=document.createElement('section');
+  sec.className='phase';
+  const head=document.createElement('div');
+  head.className='phase-head';
+  head.innerHTML='<span class="phase-badge" style="background:'+ph.color+'">'+ph.badge+'</span>'
+    +'<h2>'+ph.name+'</h2>'
+    +'<span class="phase-days">Day '+ph.range[0]+'–'+ph.range[1]+'</span>'
+    +'<span class="phase-desc">'+ph.desc+'</span>';
+  const grid=document.createElement('div');
+  grid.className='grid';
+
+  for(let d=ph.range[0];d<=ph.range[1];d++){
+    const info=DAYS[d];
+    const card=document.createElement('article');
+    card.className='card'+(done.has(d)?' done':'');
+    card.title='点击标记为已完成';
+    const ul=info.p.map(function(i){return '<li>'+i+'</li>'}).join('');
+    card.innerHTML='<span class="day-num">DAY '+String(d).padStart(2,'0')+'</span>'
+      +'<span class="check">✓</span>'
+      +'<h3>'+info.t+'</h3>'
+      +'<ul>'+ul+'</ul>'
+      +'<div class="quiz">🎯 学完检验：'+info.q+'</div>';
+    card.addEventListener('click',function(){
+      if(done.has(d)){done.delete(d)}else{done.add(d)}
+      card.classList.toggle('done',done.has(d));
+      localStorage.setItem(KEY,JSON.stringify(Array.from(done)));
+      updateProgress();
+    });
+    grid.appendChild(card);
+  }
+  sec.appendChild(head);
+  sec.appendChild(grid);
+  app.appendChild(sec);
+});
+
+function updateProgress(){
+  const n=done.size,pct=Math.round(n/30*100);
+  document.getElementById('pf').style.width=pct+'%';
+  document.getElementById('pt').textContent='已完成 '+n+' / 30 天 · '+pct+'%';
+}
+updateProgress();
+
+document.getElementById('reset').addEventListener('click',function(){
+  if(confirm('确定要清空全部学习进度吗？')){
+    done.clear();
+    localStorage.removeItem(KEY);
+    document.querySelectorAll('.card').forEach(function(c){c.classList.remove('done')});
+    updateProgress();
+  }
+});
+</script>
+</body>
+</html>
